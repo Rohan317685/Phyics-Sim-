@@ -1,4 +1,5 @@
 
+
 const Engine = Matter.Engine,
     Render = Matter.Render,
     Runner = Matter.Runner,
@@ -21,7 +22,7 @@ const app = {
     gravity: 1,
     isPaused: false,
 
-   
+
     width: window.innerWidth,
     height: window.innerHeight,
 
@@ -29,14 +30,14 @@ const app = {
         console.log("App initializing...");
         this.setupNavigation();
 
-       
+
         window.addEventListener('resize', () => {
             this.width = window.innerWidth;
             this.height = window.innerHeight;
             if (this.render) {
                 this.render.canvas.width = this.width;
                 this.render.canvas.height = this.height;
- 
+
                 if (this.currentView !== 'home') {
                     this.setupBoundaries();
                 }
@@ -46,7 +47,7 @@ const app = {
         this.navigateTo('home');
     },
 
-    
+
     setupNavigation: function () {
         window.navigateTo = (viewId) => this.navigateTo(viewId);
     },
@@ -54,51 +55,51 @@ const app = {
     navigateTo: function (viewId) {
         console.log("Navigating to:", viewId);
 
-        
+
         document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
         document.getElementById(`view-${viewId}`).classList.add('active');
 
-      
+
         document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
         const btn = document.getElementById(`btn-${viewId}`);
         if (btn) btn.classList.add('active');
 
-        
+
         this.cleanupScene();
 
         this.currentView = viewId;
 
-    
+
         if (viewId === 'playground') {
-            setTimeout(() => this.setupPlayground(), 50); 
+            setTimeout(() => this.setupPlayground(), 50);
         } else if (viewId === 'collision') {
             setTimeout(() => this.setupCollision(), 50);
         }
     },
 
-    
+
     initEngine: function (containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
 
-        
+
         this.engine = Engine.create();
         this.engine.world.gravity.y = this.gravity;
 
-        
+
         this.render = Render.create({
             element: container,
             engine: this.engine,
             options: {
                 width: this.width,
                 height: this.height,
-                background: 'transparent', 
+                background: 'transparent',
                 wireframes: false,
                 showAngleIndicator: false
             }
         });
 
-  
+
         const mouse = Mouse.create(this.render.canvas);
         this.mouseConstraint = MouseConstraint.create(this.engine, {
             mouse: mouse,
@@ -108,16 +109,16 @@ const app = {
             }
         });
         World.add(this.engine.world, this.mouseConstraint);
-        this.render.mouse = mouse; 
+        this.render.mouse = mouse;
 
-       
+
         Events.on(this.mouseConstraint, 'mousedown', (event) => {
             const bodies = Matter.Query.point(this.engine.world.bodies, event.mouse.position);
             const clickedBody = bodies.find(b => b.label !== 'Wall');
             this.setSelected(clickedBody || null);
         });
 
-       
+
         Render.run(this.render);
         this.runner = Runner.create();
         Runner.run(this.runner, this.engine);
@@ -144,7 +145,7 @@ const app = {
         this.render = null;
         this.runner = null;
         this.selectedBody = null;
-        this.setSelected(null); 
+        this.setSelected(null);
     },
 
     setupBoundaries: function () {
@@ -185,7 +186,7 @@ const app = {
         const width = this.width;
         const height = this.height;
 
-        
+
         for (let i = 0; i < 6; i++) {
             for (let j = 0; j < 3; j++) {
                 const rect = Bodies.rectangle(width - 300 + j * 60, height - 100 - i * 60, 50, 50, {
@@ -196,7 +197,7 @@ const app = {
             }
         }
 
-        
+
         const ball = Bodies.circle(400, 200, 40, {
             render: { fillStyle: '#646cff' },
             density: 0.08,
@@ -226,7 +227,7 @@ const app = {
         this.setupCollision();
     },
 
- 
+
     addShape: function (type) {
         if (!this.engine) return;
 
@@ -255,9 +256,9 @@ const app = {
     clearAll: function () {
         if (!this.engine) return;
         World.clear(this.engine.world);
-        Engine.clear(this.engine); 
+        Engine.clear(this.engine);
         this.setSelected(null);
-        this.setupBoundaries(); 
+        this.setupBoundaries();
     },
 
     togglePause: function () {
@@ -270,7 +271,7 @@ const app = {
             this.runner.enabled = !paused;
         }
 
-        
+
         const playIcon = this.currentView === 'playground' ? document.getElementById('icon-play') : document.getElementById('icon-play-col');
         const pauseIcon = this.currentView === 'playground' ? document.getElementById('icon-pause') : document.getElementById('icon-pause-col');
 
@@ -288,7 +289,7 @@ const app = {
         }
     },
 
-    
+
     setSelected: function (body) {
         this.selectedBody = body;
         const panel = document.getElementById('properties-panel');
@@ -298,7 +299,7 @@ const app = {
             panel.style.display = 'block';
             noSel.style.display = 'none';
 
-            
+
             document.getElementById('input-color').value = body.render.fillStyle;
             document.getElementById('input-restitution').value = body.restitution;
             document.getElementById('val-restitution').textContent = body.restitution;
@@ -327,5 +328,5 @@ const app = {
 };
 
 
-window.app = app; 
+window.app = app;
 app.init();
